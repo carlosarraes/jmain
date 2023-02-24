@@ -31,46 +31,19 @@ public class App {
     Pattern peoplePat = Pattern.compile(regex);
     Matcher peopleMat = peoplePat.matcher(people);
 
-    String analystRegex = "\\w+=(?<projectCount>\\w+)";
-    Pattern analystPat = Pattern.compile(analystRegex);
-
-    String ceoRegex = "\\w+=(?<avgStockPrice>\\w+)";
-    Pattern ceoPat = Pattern.compile(ceoRegex);
-
     int totalSalaries = 0;
+    Employee employee = null;
     while (peopleMat.find()) {
-      totalSalaries +=
+      employee =
           switch (peopleMat.group("role")) {
-            case "Programmer" -> {
-              Programmer programmer = new Programmer(peopleMat.group());
-              System.out.println(programmer.toString());
-              yield programmer.getSalary();
-            }
-            case "Manager" -> {
-              Manager manager = new Manager(peopleMat.group());
-              System.out.println(manager.toString());
-              yield manager.getSalary();
-            }
-            case "Analyst" -> {
-              Analyst analyst = new Analyst(peopleMat.group());
-              System.out.println(analyst.toString());
-              yield analyst.getSalary();
-            }
-            case "CEO" -> {
-              Matcher ceoMat = ceoPat.matcher(peopleMat.group("details"));
-              int salary = 5000;
-              if (ceoMat.find()) {
-                int avgStockPrice = Integer.parseInt(ceoMat.group("avgStockPrice"));
-                salary = 5000 + avgStockPrice * 100;
-              } else {
-                System.out.println("No match");
-              }
-              yield salary;
-            }
-            default -> {
-              yield 0;
-            }
+            case "Programmer" -> new Programmer(peopleMat.group());
+            case "Manager" -> new Manager(peopleMat.group());
+            case "Analyst" -> new Analyst(peopleMat.group());
+            case "CEO" -> new CEO(peopleMat.group());
+            default -> null;
           };
+      System.out.println(employee.toString());
+      totalSalaries += employee.getSalary();
     }
 
     NumberFormat nf = NumberFormat.getCurrencyInstance();

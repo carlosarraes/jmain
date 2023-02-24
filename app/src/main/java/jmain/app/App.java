@@ -42,8 +42,10 @@ public class App {
             case "CEO" -> new CEO(peopleMat.group());
             default -> null;
           };
-      System.out.println(employee.toString());
-      totalSalaries += employee.getSalary();
+      if (employee != null) {
+        System.out.println(employee.toString());
+        totalSalaries += employee.getSalary();
+      }
     }
 
     NumberFormat nf = NumberFormat.getCurrencyInstance();

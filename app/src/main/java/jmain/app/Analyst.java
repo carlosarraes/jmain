@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Analyst {
+public class Analyst implements Employee {
   private String firstName;
   private String lastName;
   private LocalDate dob;
@@ -36,7 +36,7 @@ public class Analyst {
   }
 
   public int getSalary() {
-    return 2500 + this.projectCount * 1000;
+    return 2500 + this.projectCount * 50;
   }
 
   @Override

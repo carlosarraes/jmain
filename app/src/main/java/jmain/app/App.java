@@ -27,22 +27,52 @@ public class App {
         """;
 
     String regex =
-        "(?<lastName>\\w+),\\s*(?<firstName>\\w+),\\s*(?<dob>\\d{1,2}/\\d{1,2}/\\d{4}),\\s*(?<role>\\w+)\\n";
-    Pattern pat = Pattern.compile(regex);
-    Matcher mat = pat.matcher(people);
-    String progRegex = "\\w+=(?<locpd>\\w+),\\w+=(?<yoe>\\w+),\\w+=(?<iq>\\w+)";
+        "(?<lastName>\\w+),\\s*(?<firstName>\\w+),\\s*(?<dob>\\d{1,2}/\\d{1,2}/\\d{4}),\\s*(?<role>\\w+)(?:,\\s*\\{(?<details>.*)\\})?\\n";
+    Pattern peoplePat = Pattern.compile(regex);
+    Matcher peopleMat = peoplePat.matcher(people);
+
+    String analystRegex = "\\w+=(?<projectCount>\\w+)";
+    Pattern analystPat = Pattern.compile(analystRegex);
+
+    String ceoRegex = "\\w+=(?<avgStockPrice>\\w+)";
+    Pattern ceoPat = Pattern.compile(ceoRegex);
 
     int totalSalaries = 0;
-    while (mat.find()) {
+    while (peopleMat.find()) {
       totalSalaries +=
-          switch (mat.group("role")) {
-            case "Programmer" -> 3000;
-            case "Manager" -> 3500;
-            case "Analyst" -> 2500;
-            case "CEO" -> 5000;
-            default -> 0;
+          switch (peopleMat.group("role")) {
+            case "Programmer" -> {
+              Programmer programmer = new Programmer(peopleMat.group());
+              System.out.println(programmer.toString());
+              yield programmer.getSalary();
+            }
+            case "Manager" -> {
+              Manager manager = new Manager(peopleMat.group());
+              System.out.println(manager.toString());
+              yield manager.getSalary();
+            }
+            case "Analyst" -> {
+              Analyst analyst = new Analyst(peopleMat.group());
+              System.out.println(analyst.toString());
+              yield analyst.getSalary();
+            }
+            case "CEO" -> {
+              Matcher ceoMat = ceoPat.matcher(peopleMat.group("details"));
+              int salary = 5000;
+              if (ceoMat.find()) {
+                int avgStockPrice = Integer.parseInt(ceoMat.group("avgStockPrice"));
+                salary = 5000 + avgStockPrice * 100;
+              } else {
+                System.out.println("No match");
+              }
+              yield salary;
+            }
+            default -> {
+              yield 0;
+            }
           };
     }
+
     NumberFormat nf = NumberFormat.getCurrencyInstance();
     System.out.println("Total salaries: " + nf.format(totalSalaries));
   }
